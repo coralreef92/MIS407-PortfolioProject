@@ -1,0 +1,323 @@
+CREATE TABLE Movie	(
+	MovieID INT PRIMARY KEY,
+	Title VARCHAR(50) NOT NULL,
+	Genre VARCHAR(50) NOT NULL,
+	LengthofMovie INT NOT NULL,
+	Rating VARCHAR(6) NOT NULL,
+	YearReleased INT NOT NULL);
+
+CREATE TABLE DVD (
+	DVDID INT PRIMARY KEY,
+	MovieID INT NOT NULL,
+	FOREIGN KEY (MovieID) REFERENCES Movie(MovieID) ON DELETE CASCADE ON UPDATE CASCADE,
+	RentalPrice FLOAT(2) NOT NULL);
+
+CREATE TABLE VHS (
+	VHSID INT PRIMARY KEY,
+	MovieID INT NOT NULL,
+	FOREIGN KEY (MovieID) REFERENCES Movie(MovieID) ON DELETE CASCADE ON UPDATE CASCADE,
+	RentalPrice Float(2) NOT NULL);
+
+CREATE TABLE Actor (
+	ActorID INT PRIMARY KEY,
+	LastName VARCHAR(50) NOT NULL,
+	FirstName VARCHAR(50) NOT NULL);
+
+CREATE TABLE ActorInventory (
+	ActorInventoryID INT PRIMARY KEY,
+	ActorID INT NOT NULL,
+	FOREIGN KEY (ActorID) REFERENCES Actor(ActorID) ON DELETE CASCADE ON UPDATE CASCADE,
+	MovieID INT NOT NULL,
+	FOREIGN KEY (MovieID) REFERENCES Movie(MovieID) ON DELETE CASCADE ON UPDATE CASCADE);
+
+CREATE TABLE Actress (
+	ActressID INT PRIMARY KEY,
+	LastName VARCHAR(50) NOT NULL,
+	FirstName VARCHAR(50) NOT NULL);
+
+CREATE TABLE ActressInventory (
+	ActressInventoryID INT PRIMARY KEY,
+	ActressID INT NOT NULL,
+	FOREIGN KEY (ActressID) REFERENCES Actress(ActressID) ON DELETE CASCADE ON UPDATE CASCADE,
+	MovieID INT NOT NULL,
+	FOREIGN KEY (MovieID) REFERENCES Movie(MovieID) ON DELETE CASCADE ON UPDATE CASCADE);
+
+CREATE TABLE Director (
+	DirectorID INT PRIMARY KEY,
+	LastName VARCHAR(50) NOT NULL,
+	FirstName VARCHAR(50) NOT NULL);
+
+CREATE TABLE DirectorInventory (
+	DirectorInventoryID INT PRIMARY KEY,
+	DirectorID INT NOT NULL,
+	FOREIGN KEY (DirectorID) REFERENCES Director(DirectorID) ON DELETE CASCADE ON UPDATE
+CASCADE,
+	MovieID INT NOT NULL, 
+	FOREIGN KEY (MovieID) REFERENCES Movie(MovieID) ON DELETE CASCADE ON UPDATE CASCADE);
+
+CREATE TABLE Award (
+	AwardID INT PRIMARY KEY,
+	AwardShowName VARCHAR(50) NOT NULL,
+	AwardName VARCHAR(50) NOT NULL);
+
+CREATE TABLE AwardDetail ( 
+	AwardDetailID INT PRIMARY KEY,
+	AwardID	INT NOT NULL,
+	FOREIGN KEY (AwardID) REFERENCES Award(AwardID) ON DELETE CASCADE ON UPDATE CASCADE,
+	ActorID Int,
+	FOREIGN KEY (ActorID) REFERENCES Actor(ActorID) ON DELETE CASCADE ON UPDATE CASCADE,
+	ActressID INT,
+	FOREIGN KEY (ActressID) REFERENCES Actress(ActressID) ON DELETE CASCADE ON UPDATE CASCADE,
+	DirectorID INT,
+	FOREIGN KEY (DirectorID) REFERENCES Director(DirectorID) ON DELETE CASCADE ON UPDATE CASCADE,
+	MovieID INT,
+	FOREIGN KEY (MovieID) REFERENCES Movie(MovieID) ON DELETE CASCADE ON UPDATE CASCADE,
+	YearAwarded INT NOT NULL);
+
+CREATE TABLE Customer (
+	CustomerID INT PRIMARY KEY,
+	LastName VARCHAR(50) NOT NULL,
+	FirstName VARCHAR(50) NOT NULL,
+	StreetAddress VARCHAR(50) NOT NULL, 
+	City VARCHAR(50) NOT NULL,
+	CustomerState CHAR(2) NOT NULL, 
+	ZipCode CHAR(5) NOT NULL, 
+	Email VARCHAR(50) NOT NULL,
+	Phone CHAR(10) NOT NULL);
+
+CREATE TABLE Discounts (
+	DiscountID INT PRIMARY KEY,
+	DiscountDescription VARCHAR(50) NOT NULL,
+	DiscountValue FLOAT(2) NOT NULL);
+
+CREATE TABLE MovieTransaction (
+	TransactionID INT PRIMARY KEY,
+	CustomerID INT NOT NULL,
+	FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID) ON DELETE CASCADE ON UPDATE CASCADE,
+	MovieID INT NOT NULL,
+	FOREIGN KEY (MovieID) REFERENCES Movie(MovieID) ON DELETE CASCADE ON UPDATE CASCADE, 
+	DateRented	DATE NOT NULL, 
+	DueDate DATE NOT NULL,
+	Price FLOAT(2) NOT NULL, 
+	DiscountID INT,
+	FOREIGN KEY (DiscountID) REFERENCES Discounts(DiscountID) ON DELETE CASCADE ON UPDATE CASCADE,
+	Tax FLOAT(2) NOT NULL, 
+	TotalWhenRented FLOAT(2) NOT NULL);
+
+CREATE TABLE TransactionDVD (
+	TransactionDVDID INT PRIMARY KEY,
+	TransactionID INT NOT NULL,
+	FOREIGN KEY (TransactionID) REFERENCES MovieTransaction(TransactionID) ON DELETE CASCADE ON UPDATE CASCADE,
+	MovieID INT NOT NULL,
+	FOREIGN KEY (MovieID) REFERENCES Movie(MovieID),
+	DVDID INT NOT NULL,
+	FOREIGN KEY (DVDID) REFERENCES DVD(DVDID));
+
+CREATE TABLE TransactionVHS (
+	TransactionVHSID INT PRIMARY KEY,
+	TransactionID INT NOT NULL,
+	FOREIGN KEY (TransactionID) REFERENCES MovieTransaction(TransactionID) ON DELETE CASCADE ON UPDATE CASCADE,
+	MovieID INT NOT NULL,
+	FOREIGN KEY (MovieID) REFERENCES Movie(MovieID),
+	VHSID INT NOT NULL,
+	FOREIGN KEY (VHSID) REFERENCES VHS(VHSID) ON DELETE CASCADE ON UPDATE CASCADE);
+
+CREATE TABLE MovieReturn (
+	ReturnID INT PRIMARY KEY, 
+	CustomerID INT NOT NULL,
+	FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID) ON DELETE CASCADE ON UPDATE CASCADE,
+	TransactionID INT NOT NULL,
+	FOREIGN KEY (TransactionID) REFERENCES MovieTransaction(TransactionID) ON DELETE CASCADE ON UPDATE CASCADE,
+	DateReturned DATE NOT NULL, 
+	LateFees FLOAT(2),
+	DamageFee FLOAT(2), 
+	TotalAfterReturned FLOAT(2));
+
+CREATE TABLE Distributor (
+	DistributorID INT PRIMARY KEY, 
+	DistributorName VARCHAR(50) NOT NULL, 
+	StreetAddress VARCHAR(50) NOT NULL, 
+	City VARCHAR(50) NOT NULL, 
+	DistributorState VARCHAR(50) NOT NULL, 
+	ZipCode CHAR(5) NOT NULL, 
+	Email VARCHAR(50) NOT NULL,
+	Phone CHAR(10) NOT NULL);
+
+CREATE TABLE DistributorMovie (
+	DistributorMovieID INT PRIMARY KEY,
+	DistributorID INT NOT NULL, 
+	FOREIGN KEY (DistributorID) REFERENCES Distributor(DistributorID) ON DELETE CASCADE ON UPDATE CASCADE,
+	MovieID INT NOT NULL,
+	FOREIGN KEY (MovieID) REFERENCES Movie (MovieID) ON DELETE CASCADE ON UPDATE CASCADE);
+
+CREATE TABLE DistributorDVD (
+	DistributorDVDID INT PRIMARY KEY,
+	DistributorMovieID INT NOT NULL,
+	FOREIGN KEY (DistributorMovieID) REFERENCES DistributorMovie(DistributorMovieID) ON DELETE CASCADE ON UPDATE CASCADE,
+	Price FLOAT(2) NOT NULL);
+
+CREATE TABLE DistributorVHS (
+	DistributorVHSID INT PRIMARY KEY,
+	DistributorMovieID INT NOT NULL,
+	FOREIGN KEY (DistributorMovieID) REFERENCES DistributorMovie(DistributorMovieID) ON DELETE CASCADE ON UPDATE CASCADE,
+	Price FLOAT(2) NOT NULL);
+
+4.	DML SQL INSERT script
+
+INSERT INTO Movie (MovieID, Title, Genre, LengthofMovie, Rating, YearReleased) VALUES
+('121', '10 Things I Hate About You', 'Comedy', '97', 'PG13', '1999'),
+('122', 'Clueless', 'Romantic Comedy', '97', 'PG13', '1995'),
+('123', 'Fight Club', 'Drama', '137', 'R', '1999'),
+('124', 'Garden State', 'Drama', '92', 'R', '2004'),
+('125', 'Kill Bill', 'Action', '112', 'R', '2003');
+
+INSERT INTO DVD (DVDID, MovieID, RentalPrice) VALUES
+	('221', '121', '4'),
+	('222', '122', '4'),
+	('223', '123', '4'),
+	('224', '124', '4'),
+	('225', '125', '4');
+
+INSERT INTO VHS (VHSID, MovieID, RentalPrice) VALUES
+	('321', '121', '3'),
+	('322', '122', '3'),
+	('323', '123', '3'),
+	('324', '124', '3'), 
+	('325', '125', '3');
+
+INSERT INTO Actor (ActorID, LastName, FirstName) VALUES
+	('456', 'Ledger', 'Heath'),
+	('457', 'Norton', 'Edward'),
+	('458', 'Rudd', 'Paul'), 
+	('459', 'Braff', 'Zach'), 
+	('460', 'Jackson', 'Samuel L.');
+
+INSERT INTO ActorInventory (ActorInventoryID, ActorID, MovieID) VALUES
+	('556', '456', '121'),
+	('557', '457', '123'),
+	('558', '458', '122'), 
+	('559', '459', '124'),
+	('560', '460', '125');
+
+INSERT INTO Actress (ActressID, LastName, FirstName) VALUES
+	('667', 'Stiles', 'Julia'),
+	('668', 'Murphy', 'Brittany'),
+	('669', 'Portman', 'Natalie'),
+	('670', 'Bonham Carter', 'Helena'),
+	('671', 'Thurman', 'Uma');
+
+INSERT INTO ActressInventory (ActressInventoryID, ActressID, MovieID) VALUES
+	('767', '667', '121'),
+	('768', '668', '122'),
+	('769', '670', '123'),
+	('770', '669', '124'), 
+	('771', '671', '125');
+
+INSERT INTO Director (DirectorID, LastName, FirstName) VALUES
+	('821', 'Junger', 'Gil'), 
+	('822', 'Heckerling', 'Amy'),
+	('823', 'Fincher', 'David'),
+	('824', 'Braff', 'Zach'), 
+	('825', 'Tarantino', 'Quentin');
+
+INSERT INTO DirectorInventory (DirectorInventoryID, DirectorID, MovieID) VALUES
+	('921', '821', '121'),
+	('922', '822', '122'), 
+	('923', '823', '123'), 
+	('924', '824', '124'),
+	('925', '825', '125');
+
+INSERT INTO Award (AwardID, AwardShowName, AwardName) VALUES
+	('930', 'MTV Movie Award', 'Best Breakthrough Performance'),
+	('931', 'Empire Awards UK', 'Best British Actress'),
+	('932', 'CFCA Awards', 'Best New Director'), 
+	('933', 'Empire Awards UK', 'Best Director'),
+	('934', 'MTV Movie Award', 'Best Female Performance');
+
+INSERT INTO AwardDetail (AwardDetailID, AwardID, ActorID, ActressID, DirectorID, MovieID, YearAwarded) VALUES
+	('950', '930', null, '667', null, '121', '2000'),
+	('951', '931', null, '670', null, '123', '2000'),
+	('952', '932', null, null, '824', '124', '2004'), 
+	('953', '933', null, null, '825', '125', '2004'),
+	('954', '934', null, '671', null, '125', '2004');
+
+INSERT INTO Customer (CustomerID, LastName, FirstName, StreetAddress, City, CustomerState, ZipCode, Email, Phone)VALUES
+	('111', 'Froning', 'Coral', '1713 E Lincoln Ave', 'Fort Collins', 'CO', '80524', 'coral.froning@gmail.com', '9709871124'),
+	('112', 'Smith', 'John', '123 Kalkaska', 'Fort Collins', 'CO', '80524', 'john.smith@gmail.com', '9705551234'),
+	('113', 'Doe', 'Jane', '357 Promenade Way', 'Fort Collins', 'CO', '80526', 'jane.doe@gmail.com', '9705554567'), 
+	('114', 'Singer', 'Linda', '532 Red Hill Road', 'Loveland', 'CO', '80537', 'linda.singer@gmail.com', '9705553799'), 
+	('115', 'Allen', 'Paul', '545 Redwing Road', 'Loveland', 'CO', '80537', 'paul.allen@gmail.com', '9705559065');
+	
+INSERT INTO Discounts (DiscountID, DiscountDescription, DiscountValue) VALUES
+	('1', 'Two for Tuesday rent one DVD get one DVD free', '-4'),
+	('2', 'New movies 1 dollar off on Friday', '-1'),
+	('3', 'Rent 2 VHS get 1 VHS free', '-3'),
+	('4', 'On Thursday rent one VHS get the second half off', '-1.5'),
+	('5', 'On Thursday rent one DVD get the second half off', '-2'),
+	('6', 'Two for Tuesday rent one VHS get one VHS free', '-3');
+
+INSERT INTO MovieTransaction (TransactionID, CustomerID, MovieID, DateRented, DueDate, Price, DiscountID, Tax,TotalWhenRented) VALUES
+	('380', '115', '123', '2/20/2006', '2/27/2006', '4', null, '0.30', '4.30'),
+	('381', '115', '125', '2/20/2006', '2/27/2006', '4', '1', '0', '0'),
+	('382', '111', '124', '2/23/2006', '2/27/2006', '4', '2', '0.22', '3.22'),
+	('383', '112', '122', '2/22/2006', '2/28/2006', '4', null, '0.30', '4.30'),
+	('384', '112', '123', '2/22/2006', '2/28/2006', '4', '5', '0.15', '2.15'),
+	('385', '114', '122', '2/23/2006', '3/2/2006', '3', null, '0.22', '3.22'),
+	('386', '113', '121', '2/24/2006', '3/3/2006', '3', null, '0.22', '3.22'),
+	('387', '111', '125', '2/27/2006', '3/6/2006', '3', null, '0.22', '3.22'),
+	('388', '111', '123', '2/27/2006', '3/6/2006', '3', '4', '0.11', '1.61'),
+	('389', '114', '121', '3/6/2006', '3/13/2006', '3', null, '0.22', '3.22');
+
+INSERT INTO TransactionDVD (TransactionDVDID, TransactionID, MovieID, DVDID) VALUES
+	('480', '380', '123', '223'), 
+	('481', '381', '125', '225'),
+	('482', '382', '124', '224'),
+	('483', '383', '122', '222'),
+	('484', '384', '123', '223');
+
+INSERT INTO TransactionVHS (TransactionVHSID, TransactionID, MovieID, VHSID) VALUES
+	('585', '385', '122', '322'),
+	('586', '386', '121', '321'),
+	('587', '387', '125', '325'),
+	('588', '388', '123', '323'),
+	('589', '389', '121', '321');
+
+INSERT INTO MovieReturn (ReturnID, CustomerID, TransactionID, DateReturned, LateFees, DamageFee, TotalAfterReturned)VALUES
+('690', '115', '380', '2/27/2006', '0', '0', '0'),
+('691', '115', '381', '2/27/2006', '0', '4', '4'), 
+('692', '111', '382', '2/28/2006', '1', '0', '1'),
+('693', '113', '386', '3/8/2006', '5', '3', '8'),
+('694', '114', '389', '3/13/2006', '0', '3', '3');
+
+INSERT INTO Distributor (DistributorID, DistributorName, StreetAddress, City, DistributorState, ZipCode, Email, Phone) VALUES
+	('701', 'Movies Movies Movies', '5533 Red Dog Road', 'Carbondale', 'CO', '81623', 'movies3@gmail.com', '9705556890'),
+	('702', 'Movie Warehouse', '301 Webber Way', 'Denver', 'CO', '80204', 'moviewarehouse@movies.gov', '9705554209'),
+	('703', 'Gorehound’s Playground', '1125 W Drake Rd', 'Fort Collins', 'CO', '80525', 'gorehounds@gmail.com', '9705552784'),
+	('704', 'Village Vidiot', '1220 W Elizabeth St', 'Fort Collins', 'CO', '80521', 'village.vidiot@gmail.com', '9705550483'),
+	('705', 'Sounds Easy', '902 CO-133', 'Carbondale', 'CO', '81623', 'soundseasy@video.com', '9705555185');
+
+INSERT INTO DistributorMovie (DistributorMovieID, DistributorID, MovieID) VALUES
+	('821', '701', '121'),
+	('822', '703', '122'),
+	('823', '705', '123'), 
+	('824', '702', '124'),
+	('825', '704', '124'),
+	('826', '701', '122'),
+	('827', '702', '121'),
+	('828', '705', '125'),
+	('829', '704', '125'),
+	('830', '705', '123');
+
+INSERT INTO DistributorDVD (DistributorDVDID, DistributorMovieID, Price) VALUES
+	('960', '821', '10'),
+	('961', '822', '9'),
+	('962', '825', '9'), 
+	('963', '827', '7'), 
+	('964', '829', '10');
+
+INSERT INTO DistributorVHS (DistributorVHSID, DistributorMovieID, Price) VALUES
+	('780', '823', '7'),
+	('781', '824', '5'), 
+	('782', '826', '5'), 
+	('783', '828', '7'), 
+	('784', '830', '4');
